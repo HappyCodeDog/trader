@@ -23,19 +23,25 @@ class Backtest:
         data['short_mavg'] = data['close'].rolling(window=short_window, min_periods=1).mean()
         data['long_mavg'] = data['close'].rolling(window=long_window, min_periods=1).mean()
         data['signal'] = 0
-        data['signal'][short_window:] = np.where(data['short_mavg'][short_window:] > data['long_mavg'][short_window:], 1, 0)
+        data.iloc[short_window:, data.columns.get_loc('signal')] = np.where(data['short_mavg'].iloc[short_window:] > data['long_mavg'].iloc[short_window:], 1, 0)
         data['positions'] = data['signal'].diff()
 
         # Calculate transaction fees and net profit/loss
         data['transaction_fee'] = 0
         data['net_profit_loss'] = 0
+        data['cumulative_net_profit_loss'] = 0
         shares = 20000
         fee_rate = 0.0003
 
+        data = data.reset_index()  # Reset index to use positional indexing
+
         for i in range(1, len(data)):
             if data['positions'].iloc[i] != 0:
-                data['transaction_fee'].iloc[i] = shares * data['close'].iloc[i] * fee_rate
-            data['net_profit_loss'].iloc[i] = (data['close'].iloc[i] - data['close'].iloc[i-1]) * shares - data['transaction_fee'].iloc[i]
+                data.loc[i, 'transaction_fee'] = shares * data.loc[i, 'close'] * fee_rate
+            data.loc[i, 'net_profit_loss'] = (data.loc[i, 'close'] - data.loc[i-1, 'close']) * shares - data.loc[i, 'transaction_fee']
+            data.loc[i, 'cumulative_net_profit_loss'] = data.loc[i-1, 'cumulative_net_profit_loss'] + data.loc[i, 'net_profit_loss']
+
+        data = data.set_index('trade_date')  # Set index back to 'trade_date'
 
         return data
 
@@ -59,7 +65,7 @@ class Backtest:
         """
         Plot the net profit/loss every 3 months.
         """
-        quarterly_net_profit_loss = data['net_profit_loss'].resample('3M').sum()
+        quarterly_net_profit_loss = data['cumulative_net_profit_loss'].resample('3ME').sum()
         fig, ax = plt.subplots(figsize=(12, 8))
         quarterly_net_profit_loss.plot(kind='bar', ax=ax)
         ax.set_title('Quarterly Net Profit/Loss')
