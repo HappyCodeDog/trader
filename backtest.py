@@ -46,7 +46,7 @@ class Backtest:
 
         return data
 
-    def plot_results(self, data: pd.DataFrame):
+    def plot_results(self, data: pd.DataFrame, symbol: str):
         """
         Plot the backtest results.
         """
@@ -57,7 +57,7 @@ class Backtest:
         ax.plot(data.index, data['long_mavg'], label='长期均线')
         ax.plot(data[data['positions'] == 1].index, data['short_mavg'][data['positions'] == 1], '^', markersize=10, color='g', lw=0, label='买入信号')
         ax.plot(data[data['positions'] == -1].index, data['short_mavg'][data['positions'] == -1], 'v', markersize=10, color='r', lw=0, label='卖出信号')
-        ax.set_title('双均线策略回测', fontproperties=font)
+        ax.set_title(f'{symbol} 双均线策略回测', fontproperties=font)
         ax.set_xlabel('日期', fontproperties=font)
         ax.set_ylabel('价格', fontproperties=font)
         ax.legend(prop=font)
@@ -66,7 +66,7 @@ class Backtest:
         num_transactions = self.count_transactions(data)
         ax.text(0.02, 0.95, f'交易次数: {num_transactions}', transform=ax.transAxes, fontsize=12, verticalalignment='top', fontproperties=font)
 
-        plt.show()
+        plt.show(block=False)  # Show the plot without blocking
 
     def plot_net_profit_loss(self, data: pd.DataFrame, frequency: str, title: str):
         """
@@ -80,13 +80,13 @@ class Backtest:
         ax.set_xlabel('时间', fontproperties=font)
         ax.set_ylabel('净盈亏', fontproperties=font)
         ax.set_xticklabels([x.strftime('%Y-%m') for x in net_profit_loss.index], rotation=45, fontproperties=font)
-        plt.show()
+        plt.show(block=False)  # Show the plot without blocking
 
     def plot_quarterly_net_profit_loss(self, data: pd.DataFrame):
         """
         Plot the net profit/loss every 3 months.
         """
-        self.plot_net_profit_loss(data, '3M', '季度净盈亏')
+        self.plot_net_profit_loss(data, '3ME', '季度净盈亏')
 
     def count_transactions(self, data: pd.DataFrame) -> int:
         """
