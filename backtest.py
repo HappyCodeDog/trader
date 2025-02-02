@@ -28,9 +28,9 @@ class Backtest:
         data['positions'] = data['signal'].diff()
 
         # Calculate transaction fees and net profit/loss
-        data['transaction_fee'] = 0
-        data['net_profit_loss'] = 0
-        data['cumulative_net_profit_loss'] = 0
+        data['transaction_fee'] = 0.0  # Set dtype to float
+        data['net_profit_loss'] = 0.0  # Set dtype to float
+        data['cumulative_net_profit_loss'] = 0.0  # Set dtype to float
         shares = 20000
         fee_rate = 0.0003
 
