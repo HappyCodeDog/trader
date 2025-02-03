@@ -1,10 +1,8 @@
 
-from vnpy.app.cta_strategy import CtaTemplate, BarData, ArrayManager
+from vnpy_ctastrategy import CtaTemplate, BarData, ArrayManager, CtaEngine
 from vnpy.trader.object import TradeData, OrderData
-from vnpy.trader.constant import Interval
-from vnpy.trader.engine import MainEngine, CtaEngine
+from vnpy.trader.engine import MainEngine
 from vnpy.trader.setting import SETTINGS
-from vnpy.trader.utility import load_json, save_json
 
 class DualMovingAverageStrategy(CtaTemplate):
     author = "GitHub Copilot"
